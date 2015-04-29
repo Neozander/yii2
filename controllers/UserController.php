@@ -43,7 +43,7 @@ class UserController extends Controller
 
     /**
      * Displays a single User model.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionView($id)
@@ -61,8 +61,28 @@ class UserController extends Controller
     public function actionCreate()
     {
         $model = new User();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $request = Yii::$app->request->post();
+        if ($model->load($request)) {
+            $photo = $request->get('icon');
+            var_dump($photo);
+            exit();
+            if ($photo){
+                $sourcePath = pathinfo($photo->getName());
+                $fileName = date('m-d').'-'.$model->alias.'.'.$sourcePath['extension'];
+                $model->image = $fileName;
+            }
+            if($model->save()){
+                //Если поле загрузки файла не было пустым, то
+                if ($model->icon){
+                    //сохранить файл на сервере в каталог images/2011 под именем
+                    //month-day-alias.jpg
+                    $file = $_SERVER['DOCUMENT_ROOT'].
+                        Yii::app()->urlManager->baseUrl.
+                        '/images/'.date('Y').'/'.$fileName;
+                    $model->icon->saveAs($file);
+                }
+                $this->redirect(array('view','id'=>$model->id));
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -74,7 +94,7 @@ class UserController extends Controller
     /**
      * Updates an existing User model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionUpdate($id)
@@ -93,7 +113,7 @@ class UserController extends Controller
     /**
      * Deletes an existing User model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionDelete($id)
@@ -106,7 +126,7 @@ class UserController extends Controller
     /**
      * Finds the User model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
+     * @param integer $id
      * @return User the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */

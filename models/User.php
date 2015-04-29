@@ -5,25 +5,26 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%tbl_user}}".
+ * This is the model class for table "users".
  *
- * @property string $id
- * @property string $login
- * @property string $password
+ * @property integer $id
+ * @property string $username
  * @property string $email
- * @property string $nickname
- * @property string $about
- *
- * @property TblPost[] $tblPosts
+ * @property string $password
+ * @property string $fio
+ * @property string $address
+ * @property string $photo
+ * @property string $ref_link
+ * @property integer $ref_id
  */
-class user extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%tbl_user}}';
+        return 'users';
     }
 
     /**
@@ -32,11 +33,13 @@ class user extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['login', 'password', 'email', 'nickname'], 'required'],
-            [['about'], 'string'],
-            [['login'], 'string', 'max' => 40],
-            [['password', 'email'], 'string', 'max' => 100],
-            [['nickname'], 'string', 'max' => 255]
+            [['username', 'email', 'password', 'fio', 'address', 'photo'], 'required'],
+            [['address'], 'string'],
+            [['ref_id'], 'integer'],
+            [['username'], 'string', 'max' => 40],
+            [['email', 'photo'], 'string', 'max' => 128],
+            [['password'], 'string', 'max' => 32],
+            [['fio'], 'string', 'max' => 256]
         ];
     }
 
@@ -47,19 +50,14 @@ class user extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'login' => 'Login',
-            'password' => 'Password',
+            'username' => 'Username',
             'email' => 'Email',
-            'nickname' => 'Nickname',
-            'about' => 'About',
+            'password' => 'Password',
+            'fio' => 'Fio',
+            'address' => 'Address',
+            'photo' => 'Photo',
+            'ref_link' => 'Ref Link',
+            'ref_id' => 'Ref ID',
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTblPosts()
-    {
-        return $this->hasMany(TblPost::className(), ['author_id' => 'id']);
     }
 }

@@ -10,17 +10,25 @@ use yii\widgets\ActiveForm;
 
 <div class="user-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'htmlOptions' => ['enctype'=>'multipart/form-data']
+    ]); ?>
 
-    <?= $form->field($model, 'login')->textInput(['maxlength' => 40]) ?>
+    <?= $form->field($model, 'username')->textInput(['maxlength' => 40]) ?>
 
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 100]) ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => 128]) ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => 100]) ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 32]) ?>
 
-    <?= $form->field($model, 'nickname')->textInput(['maxlength' => 255]) ?>
+    <?= $form->field($model, 'fio')->textInput(['maxlength' => 256]) ?>
 
-    <?= $form->field($model, 'about')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'address')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'photo')->fileInput() ?>
+
+    <?= $form->field($model, 'ref_link')->textInput(['maxlength' => 32]) ?>
+
+    <?= $form->field($model, 'ref_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
