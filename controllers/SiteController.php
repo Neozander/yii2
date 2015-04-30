@@ -9,6 +9,8 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\EntryForm;
+use app\models\User;
+use yii\web\UploadedFile;
 
 class SiteController extends Controller
 {
@@ -67,6 +69,29 @@ class SiteController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionRegister()
+    {
+        if (!\Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+            $params = require(__DIR__ . '/../config/params.php');
+            $model = new User();
+            $request = Yii::$app->request->post();
+            if ($model->load($request)) {
+                $model->photo = UploadedFile::getInstance($model, 'photo');
+                if ($model->validate() && $model->save()){
+                    if ($model->photo){
+                        $model->CroppedThumbnail($model->photo->tempName, Yii::getAlias('@webroot') . '/uploads/' . $model->photo->baseName . '.' . $model->photo->extension, $params['photoWidth'], $params['photoHeight']);
+                    }
+                    return $this->goBack();
+                }
+            }
+
+            return $this->render('register', [
+                'model' => $model,
+            ]);
     }
 
     public function actionLogout()

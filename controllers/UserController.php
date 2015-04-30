@@ -8,6 +8,7 @@ use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -60,35 +61,22 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
+        $params = require(__DIR__ . '/../config/params.php');
         $model = new User();
         $request = Yii::$app->request->post();
         if ($model->load($request)) {
-            $photo = $request->get('icon');
-            var_dump($photo);
-            exit();
-            if ($photo){
-                $sourcePath = pathinfo($photo->getName());
-                $fileName = date('m-d').'-'.$model->alias.'.'.$sourcePath['extension'];
-                $model->image = $fileName;
-            }
-            if($model->save()){
-                //Если поле загрузки файла не было пустым, то
-                if ($model->icon){
-                    //сохранить файл на сервере в каталог images/2011 под именем
-                    //month-day-alias.jpg
-                    $file = $_SERVER['DOCUMENT_ROOT'].
-                        Yii::app()->urlManager->baseUrl.
-                        '/images/'.date('Y').'/'.$fileName;
-                    $model->icon->saveAs($file);
+            $model->photo = UploadedFile::getInstance($model, 'photo');
+            if ($model->validate() && $model->save()){
+                if ($model->photo){
+                    $model->CroppedThumbnail($model->photo->tempName, Yii::getAlias('@webroot') . '/uploads/' . $model->photo->baseName . '.' . $model->photo->extension, $params['photoWidth'], $params['photoHeight']);
                 }
-                $this->redirect(array('view','id'=>$model->id));
+                return $this->redirect(['view', 'id' => $model->id]);
             }
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -99,10 +87,17 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
+        $params = require(__DIR__ . '/../config/params.php');
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->photo = UploadedFile::getInstance($model, 'photo');
+            if ($model->validate() && $model->save()){
+                if ($model->photo){
+                    $model->CroppedThumbnail($model->photo->tempName, Yii::getAlias('@webroot') . '/uploads/' . $model->photo->baseName . '.' . $model->photo->extension, $params['photoWidth'], $params['photoHeight']);
+                }
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         } else {
             return $this->render('update', [
                 'model' => $model,

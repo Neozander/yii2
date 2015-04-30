@@ -47,6 +47,9 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
     ],
     'params' => $params,
+    'aliases' => [
+        '@photoDir' => '/yii2/web/uploads',
+    ]
 ];
 
 if (YII_ENV_DEV) {

@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+$params = require(__DIR__ . '/../../config/params.php');
 
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
@@ -24,7 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
-
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -34,7 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'password',
             'fio',
             'address:ntext',
-            'photo',
+            [
+                'attribute' => 'photo',
+                'value' => yii::getAlias('@photoDir') . '/' . $model->photo,
+                'format' => ['image',['width'=> $params['photoWidth'],'height'=> $params['photoHeight']]],
+            ],
             'ref_link',
             'ref_id',
         ],
